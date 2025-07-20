@@ -1,0 +1,16 @@
+# dependencies
+node_modules/
+
+# dotenv config
+.env
+
+# prisma generated client (optional if committing)
+prisma/dev.db
+
+# log files
+*.log
+
+# system files
+.DS_Store
+
+/src/generated/prisma

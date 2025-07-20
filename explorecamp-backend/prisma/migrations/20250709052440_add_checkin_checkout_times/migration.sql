@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Product" ADD COLUMN     "checkInTime" TEXT NOT NULL DEFAULT '2:00 PM',
+ADD COLUMN     "checkOutTime" TEXT NOT NULL DEFAULT '11:00 AM';

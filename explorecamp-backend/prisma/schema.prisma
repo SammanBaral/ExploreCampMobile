@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "windows"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  name        String?
+  bio         String?
+  location    String?
+  password    String
+  phone       String?
+  profileImage String?
+  emergencyContactName String?
+  emergencyContactPhone String?
+  notificationSettings Json?
+  createdAt   DateTime     @default(now())
+  products    Product[]
+  bookings    Booking[]
+  reviews     Review[]
+  collections Collection[]
+  isAdmin     Boolean      @default(false)
+}
+
+model Product {
+  id            Int            @id @default(autoincrement())
+  name          String
+  location      String
+  about         String?
+  pricePerNight Float
+  images        String[]
+  rating        Float          @default(0)
+  amenities     String[]
+  latitude      Float
+  longitude     Float
+  isAvailable   Boolean        @default(true)
+  checkInTime   String         @default("2:00 PM")
+  checkOutTime  String         @default("11:00 AM")
+  ownerId       Int
+  owner         User           @relation(fields: [ownerId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  availability  Availability[]
+  bookings      Booking[]
+  reviews       Review[]
+  savedSpots    SavedSpot[]
+  trending      Trending[]
+  // Added for filter support:
+  freeCancellation Boolean     @default(false)
+  maxGuests     Int            @default(4)
+}
+
+model Availability {
+  id       Int      @id @default(autoincrement())
+  date     DateTime
+  isBooked Boolean  @default(false)
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Collection {
+  id          Int         @id @default(autoincrement())
+  title       String
+  description String?
+  coverImage  String?
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+  savedSpots  SavedSpot[]
+  private     Boolean     @default(false)
+}
+
+model Booking {
+  id                 Int      @id @default(autoincrement())
+  user               User     @relation(fields: [userId], references: [id])
+  userId             Int
+  product            Product  @relation(fields: [productId], references: [id])
+  productId          Int
+  checkIn            DateTime
+  checkOut           DateTime
+  guestName          String
+  guestEmail         String
+  guestPhone         String
+  specialRequest     String?
+  totalPrice         Float
+  paymentMethod      String
+  status             String   @default("pending") // Changed from "confirmed" to "pending"
+  cancellationCharge Float?   // New field for cancellation charge
+  refundAmount       Float?   // New field for refund amount
+  createdAt          DateTime @default(now())
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+}
+
+model SavedSpot {
+  id           Int        @id @default(autoincrement())
+  productId    Int
+  product      Product    @relation(fields: [productId], references: [id])
+  collectionId Int
+  collection   Collection @relation(fields: [collectionId], references: [id])
+}
+
+model Trending {
+  id        Int    @id @default(autoincrement())
+  productId Int
+  order     Int    // for ordering trending products
+  product   Product @relation(fields: [productId], references: [id])
+}

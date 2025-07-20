@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: crusher
+      POSTGRES_DB: explorecamp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:crusher@db:5432/explorecamp"
+      JWT_SECRET: "supersecretkey"
+      PORT: 5000
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads 
+    command: ["node", "src/index.js"]
+
+volumes:
+  pgdata:

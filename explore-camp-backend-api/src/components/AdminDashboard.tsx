@@ -288,7 +288,7 @@ const AdminDashboard = () => {
 
     const handleDeleteUser = async () => {
         if (!userToDelete) return;
-        
+
         setDeleteLoading(true);
         setError('');
         try {
@@ -507,13 +507,13 @@ const AdminDashboard = () => {
                 )}
                 {/* Users Section */}
                 {activeSection === 'users' && (
-                    <div>
+                    <div className="w-full">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-2xl font-bold">Users</h3>
                             <Button onClick={() => { setShowAddUserModal(true); setAddUserForm({ name: '', email: 'sammanbaral123@gmail.com', password: 'samman@', location: '', isAdmin: false }); }}>Add User</Button>
                         </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full mb-8 min-w-[800px]">
+                        <div className="overflow-x-auto w-full">
+                            <table className="w-full mb-8 min-w-[1000px]">
                                 <thead>
                                     <tr className="border-b">
                                         <th className="text-left py-2 w-[150px]">Name</th>
@@ -523,105 +523,24 @@ const AdminDashboard = () => {
                                         <th className="text-left py-2 w-[200px]">Actions</th>
                                     </tr>
                                 </thead>
-                            <tbody>
-                                {users.map((u) => (
-                                    <tr key={u.id} className="border-b">
-                                        <td className="py-2">{u.name}</td>
-                                        <td className="py-2">{u.email}</td>
-                                        <td className="py-2">{u.location}</td>
-                                        <td className="py-2">{u.isAdmin ? 'Yes' : 'No'}</td>
-                                        <td className="py-2">
-                                            <div className="flex gap-2">
-                                                <Button size="sm" variant="secondary" onClick={() => openUserModal(u)}>Edit</Button>
-                                                <Button size="sm" variant="destructive" onClick={() => openDeleteUserModal(u)}>Delete</Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {/* Add User Modal */}
-                        <Dialog open={showAddUserModal} onOpenChange={setShowAddUserModal}>
-                            <DialogContent className="max-w-md w-full">
-                                <DialogHeader>
-                                    <DialogTitle>Add User</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-3">
-                                    <Input placeholder="Name" value={addUserForm.name} onChange={e => setAddUserForm(f => ({ ...f, name: e.target.value }))} />
-                                    <Input placeholder="Email" value={addUserForm.email} onChange={e => setAddUserForm(f => ({ ...f, email: e.target.value }))} />
-                                    <Input placeholder="Password" type="password" value={addUserForm.password} onChange={e => setAddUserForm(f => ({ ...f, password: e.target.value }))} />
-                                    <Input placeholder="Location" value={addUserForm.location} onChange={e => setAddUserForm(f => ({ ...f, location: e.target.value }))} />
-                                    <label className="flex items-center gap-2">
-                                        <input type="checkbox" checked={addUserForm.isAdmin} onChange={e => setAddUserForm(f => ({ ...f, isAdmin: e.target.checked }))} />
-                                        Admin
-                                    </label>
-                                    {error && <div className="text-red-500 text-sm">{error}</div>}
-                                    <Button onClick={handleAddUser} disabled={loading}>{loading ? 'Adding...' : 'Add User'}</Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                        {/* User Modal */}
-                        <Dialog open={showUserModal} onOpenChange={setShowUserModal}>
-                            <DialogContent className="max-w-md w-full">
-                                <DialogHeader>
-                                    <DialogTitle>Edit User</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                    <Input placeholder="Name" value={userForm.name} onChange={e => setUserForm(f => ({ ...f, name: e.target.value }))} />
-                                    <Input placeholder="Email" value={userForm.email} onChange={e => setUserForm(f => ({ ...f, email: e.target.value }))} />
-                                    <Input placeholder="Location" value={userForm.location} onChange={e => setUserForm(f => ({ ...f, location: e.target.value }))} />
-                                    <label className="flex items-center gap-2">
-                                        <input type="checkbox" checked={userForm.isAdmin} onChange={e => setUserForm(f => ({ ...f, isAdmin: e.target.checked }))} />
-                                        Admin
-                                    </label>
-                                    {error && <div className="text-red-500">{error}</div>}
-                                    <Button onClick={saveUser} disabled={loading}>{loading ? 'Saving...' : 'Save'}</Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                        {/* Delete User Confirmation Modal */}
-                        <Dialog open={showDeleteUserModal} onOpenChange={setShowDeleteUserModal}>
-                            <DialogContent className="max-w-md w-full">
-                                <DialogHeader>
-                                    <DialogTitle>Delete User</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                    <div className="text-sm text-gray-600">
-                                        Are you sure you want to delete <strong>{userToDelete?.name || userToDelete?.email}</strong>?
-                                    </div>
-                                    <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
-                                        <strong>Warning:</strong> This action will permanently delete:
-                                        <ul className="list-disc list-inside mt-2 space-y-1">
-                                            <li>The user account</li>
-                                            <li>All their bookings</li>
-                                            <li>All their saved collections</li>
-                                        </ul>
-                                        This action cannot be undone.
-                                    </div>
-                                    {error && <div className="text-red-500 text-sm">{error}</div>}
-                                    <div className="flex gap-2 justify-end">
-                                        <Button 
-                                            variant="outline" 
-                                            onClick={() => {
-                                                setShowDeleteUserModal(false);
-                                                setUserToDelete(null);
-                                                setError('');
-                                            }}
-                                            disabled={deleteLoading}
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button 
-                                            variant="destructive" 
-                                            onClick={handleDeleteUser} 
-                                            disabled={deleteLoading}
-                                        >
-                                            {deleteLoading ? 'Deleting...' : 'Delete User'}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
+                                <tbody>
+                                    {users.map((u) => (
+                                        <tr key={u.id} className="border-b">
+                                            <td className="py-2">{u.name}</td>
+                                            <td className="py-2">{u.email}</td>
+                                            <td className="py-2">{u.location}</td>
+                                            <td className="py-2">{u.isAdmin ? 'Yes' : 'No'}</td>
+                                            <td className="py-2">
+                                                <div className="flex gap-2">
+                                                    <Button size="sm" variant="secondary" onClick={() => openUserModal(u)}>Edit</Button>
+                                                    <Button size="sm" variant="destructive" onClick={() => openDeleteUserModal(u)}>Delete</Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
                 {/* Bookings Section */}

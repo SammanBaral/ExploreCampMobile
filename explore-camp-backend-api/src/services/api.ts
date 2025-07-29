@@ -312,6 +312,13 @@ class ApiService {
     });
   }
 
+  async adminAddUser(user: any): Promise<ApiResponse<any>> {
+    return this.makeRequest<any>('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(user),
+    });
+  }
+
   // Utility methods
   isAuthenticated(): boolean {
     return !!this.token;
@@ -448,3 +455,4 @@ export default apiService;
 export type {
   ApiResponse, LoginRequest, LoginResponse, Product, RegisterRequest, User
 };
+

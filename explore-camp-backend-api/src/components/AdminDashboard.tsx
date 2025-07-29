@@ -730,6 +730,175 @@ const AdminDashboard = () => {
                     </div>
                 )}
             </main>
+
+            {/* User Edit Modal */}
+            {showUserModal && (
+                <Dialog open={showUserModal} onOpenChange={setShowUserModal}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Edit User</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <div>
+                                <Label htmlFor="user-name">Name</Label>
+                                <Input
+                                    id="user-name"
+                                    placeholder="Name"
+                                    value={userForm.name}
+                                    onChange={e => setUserForm(f => ({ ...f, name: e.target.value }))}
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="user-email">Email</Label>
+                                <Input
+                                    id="user-email"
+                                    placeholder="Email"
+                                    type="email"
+                                    value={userForm.email}
+                                    onChange={e => setUserForm(f => ({ ...f, email: e.target.value }))}
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="user-location">Location</Label>
+                                <Input
+                                    id="user-location"
+                                    placeholder="Location"
+                                    value={userForm.location}
+                                    onChange={e => setUserForm(f => ({ ...f, location: e.target.value }))}
+                                />
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    id="user-admin"
+                                    checked={userForm.isAdmin}
+                                    onChange={e => setUserForm(f => ({ ...f, isAdmin: e.target.checked }))}
+                                    className="rounded"
+                                />
+                                <Label htmlFor="user-admin">Admin User</Label>
+                            </div>
+                            {error && <div className="text-red-500 text-sm">{error}</div>}
+                            <div className="flex gap-2">
+                                <Button onClick={saveUser} disabled={loading}>
+                                    {loading ? 'Saving...' : 'Save User'}
+                                </Button>
+                                <Button variant="outline" onClick={() => setShowUserModal(false)}>
+                                    Cancel
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
+
+            {/* Add User Modal */}
+            {showAddUserModal && (
+                <Dialog open={showAddUserModal} onOpenChange={setShowAddUserModal}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Add New User</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <div>
+                                <Label htmlFor="add-user-name">Name</Label>
+                                <Input
+                                    id="add-user-name"
+                                    placeholder="Name"
+                                    value={addUserForm.name}
+                                    onChange={e => setAddUserForm(f => ({ ...f, name: e.target.value }))}
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="add-user-email">Email</Label>
+                                <Input
+                                    id="add-user-email"
+                                    placeholder="Email"
+                                    type="email"
+                                    value={addUserForm.email}
+                                    onChange={e => setAddUserForm(f => ({ ...f, email: e.target.value }))}
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="add-user-password">Password</Label>
+                                <Input
+                                    id="add-user-password"
+                                    placeholder="Password"
+                                    type="password"
+                                    value={addUserForm.password}
+                                    onChange={e => setAddUserForm(f => ({ ...f, password: e.target.value }))}
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="add-user-location">Location</Label>
+                                <Input
+                                    id="add-user-location"
+                                    placeholder="Location"
+                                    value={addUserForm.location}
+                                    onChange={e => setAddUserForm(f => ({ ...f, location: e.target.value }))}
+                                />
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    id="add-user-admin"
+                                    checked={addUserForm.isAdmin}
+                                    onChange={e => setAddUserForm(f => ({ ...f, isAdmin: e.target.checked }))}
+                                    className="rounded"
+                                />
+                                <Label htmlFor="add-user-admin">Admin User</Label>
+                            </div>
+                            {error && <div className="text-red-500 text-sm">{error}</div>}
+                            <div className="flex gap-2">
+                                <Button onClick={handleAddUser} disabled={loading}>
+                                    {loading ? 'Adding...' : 'Add User'}
+                                </Button>
+                                <Button variant="outline" onClick={() => setShowAddUserModal(false)}>
+                                    Cancel
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
+
+            {/* Delete User Confirmation Modal */}
+            {showDeleteUserModal && (
+                <Dialog open={showDeleteUserModal} onOpenChange={setShowDeleteUserModal}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete User</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <p className="text-sm text-muted-foreground">
+                                Are you sure you want to delete user <strong>{userToDelete?.name}</strong> ({userToDelete?.email})?
+                            </p>
+                            <p className="text-sm text-red-600">
+                                ⚠️ This action will permanently delete the user and all their bookings and collections. This cannot be undone.
+                            </p>
+                            {error && <div className="text-red-500 text-sm">{error}</div>}
+                            <div className="flex gap-2">
+                                <Button 
+                                    variant="destructive" 
+                                    onClick={handleDeleteUser} 
+                                    disabled={deleteLoading}
+                                >
+                                    {deleteLoading ? 'Deleting...' : 'Delete User'}
+                                </Button>
+                                <Button 
+                                    variant="outline" 
+                                    onClick={() => {
+                                        setShowDeleteUserModal(false);
+                                        setUserToDelete(null);
+                                        setError('');
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
         </div>
     );
 };

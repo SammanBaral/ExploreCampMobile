@@ -164,6 +164,85 @@ router.put('/users/:id', async (req, res) => {
     }
 });
 
+// Add new user (admin)
+router.post('/users', async (req, res) => {
+    try {
+        console.log('[ADMIN] Creating new user:', req.body);
+        const { name, email, password, location, isAdmin } = req.body;
+        
+        // Check if user already exists
+        const existingUser = await prisma.user.findUnique({
+            where: { email }
+        });
+        
+        if (existingUser) {
+            return res.status(400).json({ error: 'User with this email already exists' });
+        }
+
+        const user = await prisma.user.create({
+            data: {
+                name,
+                email,
+                password, // In production, this should be hashed
+                location,
+                isAdmin: isAdmin || false
+            }
+        });
+        
+        console.log(`[ADMIN] Successfully created user: ${user.email}`);
+        res.json(user);
+    } catch (error) {
+        console.error('[ADMIN] Error creating user:', error);
+        res.status(500).json({ error: 'Failed to create user' });
+    }
+});
+
+// Delete user (admin) - includes their bookings and collections
+router.delete('/users/:id', async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        console.log(`[ADMIN] Deleting user with ID: ${userId}`);
+        
+        // First, check if user exists
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
+        });
+        
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        console.log(`[ADMIN] Found user to delete: ${user.email}`);
+        
+        // Delete user's bookings first (due to foreign key constraints)
+        const deletedBookings = await prisma.booking.deleteMany({
+            where: { userId: userId }
+        });
+        console.log(`[ADMIN] Deleted ${deletedBookings.count} bookings for user ${userId}`);
+        
+        // Delete user's collections if they exist
+        try {
+            const deletedCollections = await prisma.collection.deleteMany({
+                where: { userId: userId }
+            });
+            console.log(`[ADMIN] Deleted ${deletedCollections.count} collections for user ${userId}`);
+        } catch (collectionError) {
+            console.log('[ADMIN] No collections table or no collections to delete');
+        }
+        
+        // Finally, delete the user
+        await prisma.user.delete({
+            where: { id: userId }
+        });
+        
+        console.log(`[ADMIN] Successfully deleted user ${userId} and all related data`);
+        res.json({ success: true, message: 'User and all related data deleted successfully' });
+    } catch (error) {
+        console.error('[ADMIN] Error deleting user:', error);
+        res.status(500).json({ error: 'Failed to delete user' });
+    }
+});
+
 // Trending persistence in DB
 router.get('/trending', async (req, res) => {
     try {

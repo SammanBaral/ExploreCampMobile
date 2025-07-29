@@ -284,7 +284,7 @@ class ApiService {
   }
 
   async adminUpdateUser(id: number, userData: any): Promise<ApiResponse<User>> {
-    return this.makeRequest<User>(`/users/update/${id}`, {
+    return this.makeRequest<User>(`/admin/users/${id}`, {
       method: 'PUT',
       body: JSON.stringify(userData),
     });

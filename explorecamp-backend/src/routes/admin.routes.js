@@ -68,6 +68,10 @@ router.post('/products', uploadMultiple, async (req, res) => {
 
         const parsedAmenities = Array.isArray(amenities) ? amenities : JSON.parse(amenities || '[]');
         const imageFilenames = req.files ? req.files.map(file => file.filename) : [];
+        
+        // Convert arrays to JSON strings for SQLite
+        const amenitiesString = JSON.stringify(parsedAmenities);
+        const imagesString = JSON.stringify(imageFilenames);
 
         const product = await prisma.product.create({
             data: {
@@ -75,11 +79,11 @@ router.post('/products', uploadMultiple, async (req, res) => {
                 location,
                 about,
                 pricePerNight: parseFloat(pricePerNight),
-                amenities: parsedAmenities,
+                amenities: amenitiesString,
                 latitude: parseFloat(latitude),
                 longitude: parseFloat(longitude),
                 ownerId: parseInt(ownerId),
-                images: imageFilenames,
+                images: imagesString,
                 checkInTime: checkInTime || "2:00 PM",
                 checkOutTime: checkOutTime || "11:00 AM",
             }

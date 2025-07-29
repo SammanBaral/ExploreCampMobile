@@ -10,8 +10,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -40,9 +40,9 @@ model Product {
   location      String
   about         String?
   pricePerNight Float
-  images        String[]
+  images        String
   rating        Float          @default(0)
-  amenities     String[]
+  amenities     String
   latitude      Float
   longitude     Float
   isAvailable   Boolean        @default(true)

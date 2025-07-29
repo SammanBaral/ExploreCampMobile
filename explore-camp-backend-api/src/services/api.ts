@@ -58,8 +58,8 @@ class ApiService {
 
   constructor() {
     // Use HTTP since the backend is running on HTTP
-    // Note: This will cause mixed content issues if the app is served over HTTPS
-    this.baseURL = 'http://10.0.2.2:5000';
+    // For development: use localhost, for Android emulator: use 10.0.2.2
+    this.baseURL = 'http://localhost:3001';
     this.token = localStorage.getItem('authToken');
   }
 

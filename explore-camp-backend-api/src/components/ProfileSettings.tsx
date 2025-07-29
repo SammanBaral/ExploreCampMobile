@@ -14,6 +14,7 @@ const ProfileSettings = () => {
 
   const handleLogout = async () => {
     await apiService.logout();
+    localStorage.removeItem('userData');
     navigate('/login');
   };
 

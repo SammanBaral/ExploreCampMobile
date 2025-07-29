@@ -55,6 +55,9 @@ const AdminDashboard = () => {
     const [bookingLoading, setBookingLoading] = useState(false);
     const [showAddUserModal, setShowAddUserModal] = useState(false);
     const [addUserForm, setAddUserForm] = useState({ name: '', email: '', password: '', location: '', isAdmin: false });
+    const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<any>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     // Access control: Only allow admin
     const adminStatus = isAdmin();
@@ -283,6 +286,32 @@ const AdminDashboard = () => {
         setLoading(false);
     };
 
+    const handleDeleteUser = async () => {
+        if (!userToDelete) return;
+        
+        setDeleteLoading(true);
+        setError('');
+        try {
+            const res = await apiService.adminDeleteUser(userToDelete.id);
+            if (res.data || !res.error) {
+                // Refresh users list
+                fetchUsers();
+                setShowDeleteUserModal(false);
+                setUserToDelete(null);
+            } else {
+                setError(res.error || 'Failed to delete user');
+            }
+        } catch (err) {
+            setError('Failed to delete user');
+        }
+        setDeleteLoading(false);
+    };
+
+    const openDeleteUserModal = (user: any) => {
+        setUserToDelete(user);
+        setShowDeleteUserModal(true);
+    };
+
     if (!adminStatus) {
         return <div className="min-h-screen flex items-center justify-center text-xl font-bold">Access Denied</div>;
     }
@@ -483,16 +512,17 @@ const AdminDashboard = () => {
                             <h3 className="text-2xl font-bold">Users</h3>
                             <Button onClick={() => { setShowAddUserModal(true); setAddUserForm({ name: '', email: 'sammanbaral123@gmail.com', password: 'samman@', location: '', isAdmin: false }); }}>Add User</Button>
                         </div>
-                        <table className="w-full mb-8">
-                            <thead>
-                                <tr className="border-b">
-                                    <th className="text-left py-2">Name</th>
-                                    <th className="text-left py-2">Email</th>
-                                    <th className="text-left py-2">Location</th>
-                                    <th className="text-left py-2">Admin</th>
-                                    <th className="text-left py-2">Actions</th>
-                                </tr>
-                            </thead>
+                        <div className="overflow-x-auto">
+                            <table className="w-full mb-8 min-w-[800px]">
+                                <thead>
+                                    <tr className="border-b">
+                                        <th className="text-left py-2 w-[150px]">Name</th>
+                                        <th className="text-left py-2 w-[200px]">Email</th>
+                                        <th className="text-left py-2 w-[150px]">Location</th>
+                                        <th className="text-left py-2 w-[80px]">Admin</th>
+                                        <th className="text-left py-2 w-[200px]">Actions</th>
+                                    </tr>
+                                </thead>
                             <tbody>
                                 {users.map((u) => (
                                     <tr key={u.id} className="border-b">
@@ -501,7 +531,10 @@ const AdminDashboard = () => {
                                         <td className="py-2">{u.location}</td>
                                         <td className="py-2">{u.isAdmin ? 'Yes' : 'No'}</td>
                                         <td className="py-2">
-                                            <Button size="sm" variant="secondary" onClick={() => openUserModal(u)}>Edit</Button>
+                                            <div className="flex gap-2">
+                                                <Button size="sm" variant="secondary" onClick={() => openUserModal(u)}>Edit</Button>
+                                                <Button size="sm" variant="destructive" onClick={() => openDeleteUserModal(u)}>Delete</Button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -543,6 +576,49 @@ const AdminDashboard = () => {
                                     </label>
                                     {error && <div className="text-red-500">{error}</div>}
                                     <Button onClick={saveUser} disabled={loading}>{loading ? 'Saving...' : 'Save'}</Button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                        {/* Delete User Confirmation Modal */}
+                        <Dialog open={showDeleteUserModal} onOpenChange={setShowDeleteUserModal}>
+                            <DialogContent className="max-w-md w-full">
+                                <DialogHeader>
+                                    <DialogTitle>Delete User</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                    <div className="text-sm text-gray-600">
+                                        Are you sure you want to delete <strong>{userToDelete?.name || userToDelete?.email}</strong>?
+                                    </div>
+                                    <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                                        <strong>Warning:</strong> This action will permanently delete:
+                                        <ul className="list-disc list-inside mt-2 space-y-1">
+                                            <li>The user account</li>
+                                            <li>All their bookings</li>
+                                            <li>All their saved collections</li>
+                                        </ul>
+                                        This action cannot be undone.
+                                    </div>
+                                    {error && <div className="text-red-500 text-sm">{error}</div>}
+                                    <div className="flex gap-2 justify-end">
+                                        <Button 
+                                            variant="outline" 
+                                            onClick={() => {
+                                                setShowDeleteUserModal(false);
+                                                setUserToDelete(null);
+                                                setError('');
+                                            }}
+                                            disabled={deleteLoading}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button 
+                                            variant="destructive" 
+                                            onClick={handleDeleteUser} 
+                                            disabled={deleteLoading}
+                                        >
+                                            {deleteLoading ? 'Deleting...' : 'Delete User'}
+                                        </Button>
+                                    </div>
                                 </div>
                             </DialogContent>
                         </Dialog>

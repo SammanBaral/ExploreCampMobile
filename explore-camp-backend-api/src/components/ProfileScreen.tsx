@@ -240,9 +240,14 @@ const ProfileScreen = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        {/* Replace with <Spinner /> if you have a spinner component */}
-        <div className="text-muted-foreground text-lg">Loading profile...</div>
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <div className="text-muted-foreground text-lg mb-4">You must be logged in to view your profile.</div>
+        <button
+          className="px-6 py-2 bg-primary text-white rounded hover:bg-primary/90 transition"
+          onClick={() => navigate('/login')}
+        >
+          Login
+        </button>
       </div>
     );
   }

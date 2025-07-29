@@ -128,6 +128,13 @@ const AppProviders = ({ children }: { children: React.ReactNode }) => {
 const AppContent = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
+  const user = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('userData') || 'null');
+    } catch {
+      return null;
+    }
+  })();
   const hideNavigation = ['/login', '/register', '/profile/settings'].includes(location.pathname) ||
     location.pathname.startsWith('/campsite/') ||
     location.pathname.startsWith('/booking/');
@@ -149,6 +156,16 @@ const AppContent = () => {
         onComplete={() => setIsLoading(false)}
       />
     );
+  }
+
+  // If not logged in, only allow /login and /register
+  if (!user && location.pathname !== '/login' && location.pathname !== '/register') {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If logged in and on /login or /register, redirect to /home
+  if (user && (location.pathname === '/login' || location.pathname === '/register')) {
+    return <Navigate to="/home" replace />;
   }
 
   return (

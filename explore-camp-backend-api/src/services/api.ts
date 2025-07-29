@@ -425,6 +425,19 @@ class ApiService {
     console.log(`[API] Admin booking status update response:`, response);
     return response;
   }
+
+  // Admin: Delete user (including their bookings and collections)
+  async adminDeleteUser(userId: number): Promise<ApiResponse<any>> {
+    console.log(`[API] Admin deleting user ${userId}`);
+    console.log(`[API] Token: ${this.token ? 'Present' : 'Missing'}`);
+
+    const response = await this.makeRequest<any>(`/admin/users/${userId}`, {
+      method: 'DELETE'
+    });
+
+    console.log(`[API] Admin user deletion response:`, response);
+    return response;
+  }
 }
 
 // Create and export a singleton instance
